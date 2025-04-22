@@ -5,54 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ứng dụng Học Từ Vựng</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        table { margin: auto; border-collapse: collapse; width: 80%; }
-        th, td { border: 1px solid #ddd; padding: 8px; }
-        th { background-color: #f4f4f4; }
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        textarea { width: 80%; height: 150px; padding: 10px; }
+        button { margin-top: 10px; padding: 10px; }
+        ul { list-style-type: none; padding: 0; }
+        li { background: #f4f4f4; margin: 5px; padding: 10px; }
     </style>
 </head>
 <body>
-    <h1>Danh sách từ vựng</h1>
-    <table id="vocabTable">
-        <thead>
-            <tr>
-                <th>Từ vựng</th>
-                <th>Ý nghĩa</th>
-                <th>Ví dụ</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <h1>Dán danh sách từ vựng</h1>
+    <textarea id="inputBox" placeholder="Dán từ vựng vào đây (mỗi dòng một từ)"></textarea><br>
+    <button onclick="displayWords()">Hiển thị danh sách</button>
+    <h2>Danh sách từ vựng:</h2>
+    <ul id="wordList"></ul>
 
     <script>
-        async function fetchVocab() {
-            const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQvmD64SSmh3gIS_B4bSnJ5rNL8mPNm6fYSVTnGtYhy5lNLOrGrZLfqfuKos1_-GiH3t9p5DEUZ2Bwo/pub?output=csv";
+        function displayWords() {
+            let inputText = document.getElementById("inputBox").value;
+            let words = inputText.split("\n"); // Tách từng dòng
+            let wordList = document.getElementById("wordList");
+            wordList.innerHTML = ""; // Xóa danh sách cũ
 
-            try {
-                const response = await fetch(sheetUrl);
-                const data = await response.text();
-                const rows = data.split("\n").map(row => row.split(","));
-                
-                const tableBody = document.querySelector("#vocabTable tbody");
-                tableBody.innerHTML = ""; // Xóa nội dung cũ
-
-                rows.forEach((row, index) => {
-                    if (index === 0) return; // Bỏ qua tiêu đề
-
-                    let tr = document.createElement("tr");
-                    row.forEach(cell => {
-                        let td = document.createElement("td");
-                        td.textContent = cell;
-                        tr.appendChild(td);
-                    });
-                    tableBody.appendChild(tr);
-                });
-            } catch (error) {
-                console.error("Lỗi khi lấy dữ liệu:", error);
-            }
+            words.forEach(word => {
+                if (word.trim() !== "") { // Loại bỏ dòng trống
+                    let li = document.createElement("li");
+                    li.textContent = word;
+                    wordList.appendChild(li);
+                }
+            });
         }
-
-        fetchVocab();
     </script>
 </body>
 </html>
