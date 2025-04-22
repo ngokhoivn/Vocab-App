@@ -448,38 +448,54 @@
             goBack();
         }
 
-        function checkAnswer() {
-            if (!currentWord) return;
-            
-            const userAnswer = document.getElementById("answerBox").value.trim().toLowerCase();
-            const correctAnswer = currentWord.reading.toLowerCase();
-            const resultDiv = document.getElementById("result");
-            
-            totalAttempts++;
-            
-            if (userAnswer === correctAnswer) {
-                resultDiv.textContent = "Đúng! 🎉";
-                resultDiv.className = "correct";
-                correctCount++;
-                
-                // Giảm số lần cần lặp lại cho từ này
-                currentWord.remainingRepeats--;
-                
-                // Tự động chuyển sang từ tiếp theo sau 1 giây
-                setTimeout(nextWord, 1000);
-            } else {
-                resultDiv.textContent = `Sai! Đáp án đúng là: ${currentWord.reading}`;
-                resultDiv.className = "incorrect";
-                
-                // Thêm vào danh sách từ sai nếu chưa có
-                if (!wrongWords.some(word => word.kanji === currentWord.kanji)) {
-                    wrongWords.push({...currentWord});
-                    updateWrongWordsList();
-                }
-            }
-            
-            updateStats();
+        
+function normalizeJapanese(text) {
+    return text.replace(/[\s。、「」『』？！]/g, '').toLowerCase();
+}
+
+function isJapanese(text) {
+    return /[\u3040-\u30ff\u4e00-\u9faf]/.test(text);
+}
+
+function checkAnswer() {
+    if (!currentWord) return;
+
+    const userAnswerRaw = document.getElementById("answerBox").value.trim();
+    const correctAnswerRaw = currentWord.reading.trim();
+
+    let userAnswer = userAnswerRaw;
+    let correctAnswer = correctAnswerRaw;
+
+    if (isJapanese(correctAnswerRaw)) {
+        userAnswer = normalizeJapanese(userAnswerRaw);
+        correctAnswer = normalizeJapanese(correctAnswerRaw);
+    } else {
+        userAnswer = userAnswer.toLowerCase();
+        correctAnswer = correctAnswer.toLowerCase();
+    }
+
+    const resultDiv = document.getElementById("result");
+    totalAttempts++;
+
+    if (userAnswer === correctAnswer) {
+        resultDiv.textContent = "Đúng! 🎉";
+        resultDiv.className = "correct";
+        correctCount++;
+        currentWord.remainingRepeats--;
+        setTimeout(nextWord, 1000);
+    } else {
+        resultDiv.textContent = `Sai! Đáp án đúng là: ${currentWord.reading}`;
+        resultDiv.className = "incorrect";
+
+        if (!wrongWords.some(word => word.kanji === currentWord.kanji)) {
+            wrongWords.push({...currentWord});
+            updateWrongWordsList();
         }
+    }
+
+    updateStats();
+}
+
 
         function updateWrongWordsList() {
             const wrongWordsList = document.getElementById("wrongWordsList");
