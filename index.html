@@ -1,8 +1,58 @@
-<html>
+<!DOCTYPE html>
+<html lang="vi">
 <head>
-    <title>Ứng dụng học từ vựng</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ứng dụng Học Từ Vựng</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        table { margin: auto; border-collapse: collapse; width: 80%; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f4f4f4; }
+    </style>
 </head>
 <body>
-    <h1>Chào mừng bạn đến với ứng dụng học từ vựng!</h1>
+    <h1>Danh sách từ vựng</h1>
+    <table id="vocabTable">
+        <thead>
+            <tr>
+                <th>Từ vựng</th>
+                <th>Ý nghĩa</th>
+                <th>Ví dụ</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        async function fetchVocab() {
+            const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQvmD64SSmh3gIS_B4bSnJ5rNL8mPNm6fYSVTnGtYhy5lNLOrGrZLfqfuKos1_-GiH3t9p5DEUZ2Bwo/pub?output=csv";
+
+            try {
+                const response = await fetch(sheetUrl);
+                const data = await response.text();
+                const rows = data.split("\n").map(row => row.split(","));
+                
+                const tableBody = document.querySelector("#vocabTable tbody");
+                tableBody.innerHTML = ""; // Xóa nội dung cũ
+
+                rows.forEach((row, index) => {
+                    if (index === 0) return; // Bỏ qua tiêu đề
+
+                    let tr = document.createElement("tr");
+                    row.forEach(cell => {
+                        let td = document.createElement("td");
+                        td.textContent = cell;
+                        tr.appendChild(td);
+                    });
+                    tableBody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu:", error);
+            }
+        }
+
+        fetchVocab();
+    </script>
 </body>
 </html>
